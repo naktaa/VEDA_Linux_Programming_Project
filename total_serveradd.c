@@ -18,17 +18,28 @@
 #define buzzer 2  /* GPIO25 */
 #define LED_CDS 7 /* GPIO4 */
 
-#define music_length 40            /* 학교종의 전체 계이름의 수 */
-#define I2C_DEV "/dev/i2c-1";      /* I2C를 위한 장치 파일 */
-#define I2C_ADDR 0x48              // I2C 장치 주소
-#define cdsChannel 0               // 조도 센서
+#define music_length (sizeof(notes) / sizeof(notes[0])) /* 음악 전체 계이름의 수 */
+#define I2C_DEV "/dev/i2c-1"                            /* I2C를 위한 장치 파일 */
+#define I2C_ADDR 0x48                                   /* I2C 장치 주소 */
+#define cdsChannel 0                                    /* 조도 센서*/
+#define cdsBoundary 160                                 /* 조도 센서 밝기 경계값 */
+
+/* LED 설정값 */
+#define ON 255
+#define OFF 0
+#define MAX 210
+#define MID 130
+#define MIN 50
+
+#define BIT 100
+
 int sevenGPIO[4] = {4, 1, 16, 15}; /* A, B, C, D : 23 18 15 14 */
-int seven_num = -1, seven_finish = 0;
+int buzzer_run = 1, seven_num = -1, seven_finish = 0;
 int fd;
 int illuminance;
 
 /* 스레드에서 사용하는 뮤텍스 */
-pthread_mutex_t cds_lock, seven_lock;
+pthread_mutex_t buzzer_lock, seven_lock;
 
 // int notes[] = {/* 슈퍼 마리오 브라더스 오버월드 테마 */
 //                659, 659, 0, 659, 0, 523, 659, 0,
@@ -39,16 +50,35 @@ pthread_mutex_t cds_lock, seven_lock;
 //                698, 784, 0, 659,
 //                523, 587, 494, 0};
 
-int notes[] = {
-    660, 660, 0, 660, 0, 523, 660, 0,
-    784, 784, 0, 0, 392, 392, 0, 0,
-    523, 523, 0, 392, 392, 0, 329, 329,
-    0, 440, 0, 494, 0, 466, 440, 440,
-    392, 660, 784, 880, 0, 0, 784, 880,
-    0, 0, 660, 523, 587, 494, 0, 0,
-    523, 523, 0, 392, 392, 0, 330, 330,
-    0, 440, 0, 494, 0, 466, 440, 440};
+// int notes[] = { // 슈퍼마리오
+//     660, 660, 0, 660, 0, 523, 660, 0,
+//     784, 784, 0, 0, 392, 392, 0, 0,
+//     523, 523, 0, 392, 392, 0, 329, 329,
+//     0, 440, 0, 494, 0, 466, 440, 440,
+//     392, 660, 784, 880, 0, 0, 784, 880,
+//     0, 0, 660, 523, 587, 494, 0, 0,
+//     523, 523, 0, 392, 392, 0, 330, 330,
+//     0, 440, 0, 494, 0, 466, 440, 440};
 
+/*
+262 294 330 349 392 440 494
+523 587 659 698 784 880 988
+*/
+
+int notes[] = { // 징글벨
+    294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 523, 494, 440, 370,
+    587, 587, 523, 440, 494, 492, 294, 494, 440, 392, 392, 392, 294, 494, 440, 392, 330, 330, 330, 523, 494, 440,
+    587, 587, 587, 587, 659, 587, 494, 440, 392, 494, 494, 494, 494, 494, 494, 494, 587, 392, 440, 494,
+    523, 523, 523, 523, 523, 494, 494, 494, 494, 494, 440, 440, 494, 440, 587, 494, 494, 494, 494, 494, 494,
+    494, 587, 392, 440, 494, 523, 523, 523, 523, 523, 494, 494, 494, 587, 587, 523, 440, 392};
+int delays[] = {
+    BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT, BIT, BIT * 4,
+    BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT, BIT, BIT * 3, BIT / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT,
+    BIT * 1.5, BIT * 0.5, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 1.5, BIT * 0.5, BIT * 4,
+    BIT, BIT, BIT * 1.5, BIT * 0.5, BIT, BIT, BIT, BIT * 0.5, BIT * 0.5, BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2,
+    BIT, BIT, BIT * 1.5, BIT * 0.5, BIT * 4, BIT, BIT, BIT * 1.5, BIT * 0.5, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4};
+
+// 7-segment 핀 배치
 int number[10][4] = {{0, 0, 0, 0},  /* 0 */
                      {0, 0, 0, 1},  /* 1 */
                      {0, 0, 1, 0},  /* 2 */
@@ -60,9 +90,10 @@ int number[10][4] = {{0, 0, 0, 0},  /* 0 */
                      {1, 0, 0, 0},  /* 8 */
                      {1, 0, 0, 1}}; /* 9 */
 
+// void ledControl(char* pwm);
 void* buzzerControl(void* p);
 void* cdsControl(void* p);
-void* sevenControl(void* num);
+void* sevenControl(void* p);
 
 int main(int argc, char** argv) {
     struct sockaddr_in serveraddr, clientaddr;
@@ -79,22 +110,22 @@ int main(int argc, char** argv) {
     pthread_t ptBuzzer, ptCds, ptSeven;
 
     // I2C 장치 연결
-    if ((fd = wiringPiI2CSetup(I2C_ADDR)) < 0) {
-        printf("wiringPiI2CSetup failed:\n");
-    }
-    if ((fd = wiringPiI2CSetupInterface("/dev/i2c-1", I2C_ADDR)) < 0) {
+    if ((fd = wiringPiI2CSetupInterface(I2C_DEV, I2C_ADDR)) < 0) {
         printf("wiringPiI2CSetupInterface failed:\n");
     }
 
     // 기본세팅
-    wiringPiSetup();          /* wiringPi 초기화 */
-    pinMode(LED_LED, OUTPUT); /* Pin 모드를 출력으로 설정 */
-    pinMode(LED_CDS, OUTPUT); /* Pin 모드를 출력으로 설정 */
+    wiringPiSetup();                /* wiringPi 초기화 */
+    pinMode(LED_LED, OUTPUT);       /* Pin 모드를 출력으로 설정 */
+    softPwmCreate(LED_LED, 0, 255); /* PWM의 범위 설정 */
+    pinMode(LED_CDS, OUTPUT);       /* Pin 모드를 출력으로 설정 */
     for (int i = 0; i < 4; i++) {
         pinMode(sevenGPIO[i], OUTPUT); /* 모든 Pin의 출력 설정 */
     }
 
-    pthread_mutex_init(&seven_lock, NULL); /* 뮤텍스 초기화 */
+    /* 뮤텍스 초기화 */
+    pthread_mutex_init(&buzzer_lock, NULL);
+    pthread_mutex_init(&seven_lock, NULL);
 
     // 쓰레드 생성
     // pthread_create(&ptBuzzer, NULL, buzzerControl, NULL);
@@ -166,61 +197,71 @@ int main(int argc, char** argv) {
                     ret = strtok(buf_in, " \r\n");
                     strcpy(cmd1, (ret != NULL) ? ret : "");
 
-                    // LED_LED
-                    if (!strcmp(cmd1, "LED_LED")) {
+                    // LED
+                    if (!strcmp(cmd1, "LED")) {
                         ret = strtok(NULL, " \r\n");
                         strcpy(cmd2, (ret != NULL) ? ret : "");
 
+                        // if (strcmp(cmd2, "ON") || strcmp(cmd2, "OFF") || strcmp(cmd2, "MAX") || strcmp(cmd2, "MID") || strcmp(cmd2, "MIN")) {
+                        //     printf("LED 잘못된 설정값 입력\n");
+                        // }
+                        // else {
+                        //     ledControl()
+                        //     printf("\n%s %s\n", cmd1, cmd2);
+                        // }
+
                         if (!strcmp(cmd2, "ON")) {
-                            softPwmStop(LED_LED);
-                            digitalWrite(LED_LED, HIGH);
+                            softPwmWrite(LED_LED, ON & 255);
                         }
                         else if (!strcmp(cmd2, "OFF")) {
-                            softPwmStop(LED_LED);
-                            digitalWrite(LED_LED, LOW);
+                            softPwmWrite(LED_LED, OFF & 255);
                         }
                         else if (!strcmp(cmd2, "MAX")) {
-                            softPwmCreate(LED_LED, 0, 255); /* PWM의 범위 설정 */
-                            softPwmWrite(LED_LED, 210 & 255);
+                            softPwmWrite(LED_LED, MAX & 255);
                         }
                         else if (!strcmp(cmd2, "MID")) {
-                            softPwmCreate(LED_LED, 0, 255); /* PWM의 범위 설정 */
-                            softPwmWrite(LED_LED, 130 & 255);
+                            softPwmWrite(LED_LED, MID & 255);
                         }
                         else if (!strcmp(cmd2, "MIN")) {
-                            softPwmCreate(LED_LED, 0, 255); /* PWM의 범위 설정 */
-                            softPwmWrite(LED_LED, 50 & 255);
+                            softPwmWrite(LED_LED, MIN & 255);
                         }
                         else {
-                            // client에 "잘못된 명령" send
+                            printf("LED 잘못된 설정값 입력\n");
                         }
-
-                        printf("\n%s %s\n", cmd1, cmd2);
                     }
 
                     // 부저
                     if (!strcmp(cmd1, "buzzer")) {
+                        ret = strtok(NULL, " \r\n");
+                        strcpy(cmd2, (ret != NULL) ? ret : "");
+
+                        pthread_mutex_lock(&buzzer_lock);
                         if (!strcmp(cmd2, "ON")) {
+                            buzzer_run = 1;
                             // client에 "buzzer ON" send
-                            // 음악 켜기
                         }
                         else if (!strcmp(cmd2, "OFF")) {
+                            buzzer_run = 0;
                             // client에 "buzzer OFF" send
-                            // 음악 끄기
                         }
                         else {
                             // client에 "잘못된 명령" send
                         }
+                        pthread_mutex_unlock(&buzzer_lock);
                     }
+
                     // 조도센서
                     if (!strcmp(cmd1, "cds")) {
-                        if (illuminance > 180) {
+                        if (illuminance > cdsBoundary) {
                             sprintf(buf_send, "조도 센서 값 = %d --> Bright!", illuminance);
+                            write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                         else {
                             sprintf(buf_send, "조도 센서 값 = %d --> Dark!!", illuminance);
+                            write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                     }
+
                     // 7세그먼트
                     if (!strcmp(cmd1, "seven")) {
                         ret = strtok(NULL, " \r\n");
@@ -240,7 +281,9 @@ int main(int argc, char** argv) {
                                 }
                                 else {
                                     seven_num = num_input;
-                                    printf("\n%s %s\n", cmd1, cmd2);
+                                    printf("[ seg ] %d부터 카운트다운 시작\n", num_input);
+                                    sprintf(buf_send, "%d부터 카운트다운 시작\n", num_input);
+                                    write(client_list[i].data.fd, buf_send, strlen(buf_send));
                                 }
                                 pthread_mutex_unlock(&seven_lock);
                             }
@@ -250,8 +293,6 @@ int main(int argc, char** argv) {
                             }
                         }
                     }
-
-                    write(client_list[i].data.fd, buf_send, 256);
                 }
             } // else-end
         } // for-end
@@ -263,14 +304,35 @@ void* buzzerControl(void* p) {
     softToneCreate(buzzer); /* 톤 출력을 위한 GPIO 설정 */
 
     while (1) {
+        pthread_mutex_lock(&buzzer_lock);
+        int run = buzzer_run;
+        pthread_mutex_unlock(&buzzer_lock);
+
+        if (!run) {
+            delay(20);
+            continue;
+        }
+
         for (int i = 0; i < music_length; ++i) {
-            if (seven_finish) {
-                softToneWrite(buzzer, 500);
-                delay(500);
-                seven_finish = 0;
+            // if (seven_finish) {
+            //     softToneWrite(buzzer, 500);
+            //     delay(500);
+            //     seven_finish = 0;
+            // }
+            pthread_mutex_lock(&buzzer_lock);
+            int still_run = buzzer_run;
+            pthread_mutex_unlock(&buzzer_lock);
+
+            if (!still_run) {
+                break;
             }
+
             softToneWrite(buzzer, notes[i]);
-            delay(160); /* 음의 전체 길이만큼 출력되도록 대기 */
+            pthread_mutex_unlock(&buzzer_lock);
+            delay(delays[i]);
+            // delay(delays[i] * 0.9);
+            // softToneWrite(buzzer, 0);
+            // delay(delays[i] * 0.1);
         }
     }
 }
@@ -282,31 +344,30 @@ void* cdsControl(void* p) {
         delay(5);
         illuminance = wiringPiI2CRead(fd);
 
-        // 180 넘으면 어두우니까 켜기
-        if (illuminance > 160) {
+        if (illuminance > cdsBoundary) {
             digitalWrite(LED_CDS, HIGH);
         }
         else {
             digitalWrite(LED_CDS, LOW);
         }
 
-        printf("현재 조도 값 = %d\n", illuminance);
+        printf("[ cds ] 현재 조도 값 = %d\n", illuminance);
         delay(1000);
     }
 }
 
-void* sevenControl(void* num) {
+void* sevenControl(void* p) {
     while (1) {
         pthread_mutex_lock(&seven_lock);
-        if (seven_num < 0) {
-            pthread_mutex_unlock(&seven_lock);
+        int num = seven_num;
+        pthread_mutex_unlock(&seven_lock);
+
+        if (num < 0) {
             delay(20);
             continue;
         }
 
-        int seven = seven_num;
-        pthread_mutex_unlock(&seven_lock);
-        for (int n = seven; n >= 0; n--) {
+        for (int n = num; n >= 0; n--) {
             for (int i = 0; i < 4; i++) {
                 digitalWrite(sevenGPIO[i], number[n][i] ? HIGH : LOW); /* FND에 값을 출력 */
             }
