@@ -4,7 +4,8 @@
 #include <pthread.h>
 #include <softPwm.h>
 
-#define LED 1 /* GPIO18 */
+#define LED 2 /* GPIO18 */
+pthread_mutex_t led_mid, pwm_lid;
 
 void ledControl() {
     pinMode(LED, OUTPUT); /* Pin 모드를 출력으로 설정 */
@@ -31,9 +32,15 @@ void PwmControl() {
 
 int main() {
     wiringPiSetup(); /* wiringPi 초기화 */
+    pthread_t ptLed, ptPwm;
+    pthread_mutex_init(&led_mid, NULL);
+    pthread_mutex_init(&pwm_mid, NULL);
 
-    // ledControl();
-    PwmControl();
+    pthread_create(&ptLed, NULL, ledControl, NULL);
+    pthread_create(&ptPwm, NULL, PwmControl, NULL);
+
+    ledControl();
+    // PwmControl();
 
     return 0;
 }
