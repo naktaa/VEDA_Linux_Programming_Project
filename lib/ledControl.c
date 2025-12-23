@@ -36,7 +36,7 @@ int main() {
     pinMode(LED, OUTPUT);       /* Pin의 출력 설정 */
     softPwmCreate(LED, 0, 255); /* PWM의 범위 설정 */
 
-    ledPwmControl(LED);
+    PwmControl(LED);
 
     return 0;
 }
