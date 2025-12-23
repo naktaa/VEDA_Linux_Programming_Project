@@ -23,6 +23,9 @@
 // }
 
 void PwmControl() {
+    pinMode(LED, OUTPUT);       /* Pin의 출력 설정 */
+    softPwmCreate(LED, 0, 255); /* PWM의 범위 설정 */
+
     for (int i = 0; i < 10000; i++) {
         softPwmWrite(LED, i & 255); /* PWM 값을 출력: LED 켜기 */
         delay(5);
@@ -32,9 +35,7 @@ void PwmControl() {
 }
 
 int main() {
-    wiringPiSetup();            /* wiringPi 초기화 */
-    pinMode(LED, OUTPUT);       /* Pin의 출력 설정 */
-    softPwmCreate(LED, 0, 255); /* PWM의 범위 설정 */
+    wiringPiSetup(); /* wiringPi 초기화 */
 
     PwmControl(LED);
 
