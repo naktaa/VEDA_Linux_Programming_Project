@@ -6,21 +6,16 @@
 
 #define LED 1 /* GPIO18 */
 
-// void ledControl() {
-//     pinMode(LED, OUTPUT); /* Pin 모드를 출력으로 설정 */
+void ledControl() {
+    pinMode(LED, OUTPUT); /* Pin 모드를 출력으로 설정 */
 
-//     for (;;) {
-//         pthread_mutex_lock(&mid);
-//         if (light == 0) {
-//             digitalWrite(LED, HIGH);
-//         }
-//         else {
-//             digitalWrite(LED, LOW);
-//         }
-//         pthread_mutex_unlock(&mid);
-//         delay(50);
-//     }
-// }
+    for (;;) {
+        digitalWrite(LED, HIGH);
+        delay(250);
+        digitalWrite(LED, LOW);
+        delay(250);
+    }
+}
 
 void PwmControl() {
     pinMode(LED, OUTPUT);       /* Pin의 출력 설정 */
@@ -37,7 +32,8 @@ void PwmControl() {
 int main() {
     wiringPiSetup(); /* wiringPi 초기화 */
 
-    PwmControl(LED);
+    // ledControl();
+    PwmControl();
 
     return 0;
 }
