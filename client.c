@@ -10,12 +10,14 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <sys/select.h>
+#include <signal.h>
 
 void chatting(int sd);
 
 #define MAXDATASIZE 1024
 
 int main(int argc, char* argv[]) {
+    sigset_t sigset;
     int sockfd, numbytes;
     socklen_t addr_len;
     char buf[MAXDATASIZE];
@@ -34,11 +36,19 @@ int main(int argc, char* argv[]) {
         perror("socket");
         exit(1);
     }
+
+    // 시그널 마스크 설정
+    sigfillset(&sigset);
+    sigdelset(&sigset, SIGINT);
+    sigprocmask(SIG_SETMASK, &sigset, NULL);
+
+    // 서버 정보 설정
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(60000);
     server_addr.sin_addr = *((struct in_addr*)he->h_addr);
     printf("[ %s ]\n", (char*)inet_ntoa(server_addr.sin_addr));
     memset(&(server_addr.sin_zero), '\0', 8);
+
     if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1) {
         perror("connect");
         exit(1);
