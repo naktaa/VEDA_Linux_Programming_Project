@@ -14,9 +14,10 @@
 #include <softPwm.h>
 #include <softTone.h>
 
-#define LED_LED 0 /* GPIO17 */
-#define buzzer 2  /* GPIO25 */
-#define LED_CDS 7 /* GPIO4 */
+#define LED_LED 0                  /* GPIO 17 */
+#define buzzer 2                   /* GPIO 27 */
+#define LED_CDS 25                 /* GPIO 24 */
+int sevenGPIO[4] = {4, 1, 16, 15}; /* A, B, C, D : 23 18 15 14 */
 
 #define music_length (sizeof(notes) / sizeof(notes[0])) /* 음악 전체 계이름의 수 */
 #define I2C_DEV "/dev/i2c-1"                            /* I2C를 위한 장치 파일 */
@@ -31,9 +32,7 @@
 #define MID 130
 #define MIN 50
 
-#define BIT 100
-
-int sevenGPIO[4] = {4, 1, 16, 15}; /* A, B, C, D : 23 18 15 14 */
+#define BIT 200
 int buzzer_run = 1, seven_num = -1, seven_finish = 0;
 int fd;
 int illuminance;
@@ -238,14 +237,14 @@ int main(int argc, char** argv) {
                         pthread_mutex_lock(&buzzer_lock);
                         if (!strcmp(cmd2, "ON")) {
                             buzzer_run = 1;
-                            // client에 "buzzer ON" send
+                            printf("buzzer ON\n");
                         }
                         else if (!strcmp(cmd2, "OFF")) {
                             buzzer_run = 0;
-                            // client에 "buzzer OFF" send
+                            printf("buzzer OFF\n");
                         }
                         else {
-                            // client에 "잘못된 명령" send
+                            printf("buzzer 잘못된 명렁\n");
                         }
                         pthread_mutex_unlock(&buzzer_lock);
                     }
@@ -253,17 +252,17 @@ int main(int argc, char** argv) {
                     // 조도센서
                     if (!strcmp(cmd1, "cds")) {
                         if (illuminance > cdsBoundary) {
-                            sprintf(buf_send, "조도 센서 값 = %d --> Bright!", illuminance);
+                            sprintf(buf_send, "조도 센서 값 = %d --> Dark!", illuminance);
                             write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                         else {
-                            sprintf(buf_send, "조도 센서 값 = %d --> Dark!!", illuminance);
+                            sprintf(buf_send, "조도 센서 값 = %d --> Bright!!", illuminance);
                             write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                     }
 
                     // 7세그먼트
-                    if (!strcmp(cmd1, "seven")) {
+                    if (!strcmp(cmd1, "seg")) {
                         ret = strtok(NULL, " \r\n");
 
                         if (ret == NULL) {
@@ -281,8 +280,8 @@ int main(int argc, char** argv) {
                                 }
                                 else {
                                     seven_num = num_input;
-                                    printf("[ seg ] %d부터 카운트다운 시작\n", num_input);
-                                    sprintf(buf_send, "%d부터 카운트다운 시작\n", num_input);
+                                    printf("[ seg ] %d 부터 카운트다운 시작\n", num_input);
+                                    sprintf(buf_send, "%d 부터 카운트다운 시작\n", num_input);
                                     write(client_list[i].data.fd, buf_send, strlen(buf_send));
                                 }
                                 pthread_mutex_unlock(&seven_lock);
@@ -328,11 +327,10 @@ void* buzzerControl(void* p) {
             }
 
             softToneWrite(buzzer, notes[i]);
-            pthread_mutex_unlock(&buzzer_lock);
-            delay(delays[i]);
-            // delay(delays[i] * 0.9);
-            // softToneWrite(buzzer, 0);
-            // delay(delays[i] * 0.1);
+            // delay(delays[i]);
+            delay(delays[i] * 0.9);
+            softToneWrite(buzzer, 0);
+            delay(delays[i] * 0.1);
         }
     }
 }
@@ -376,8 +374,17 @@ void* sevenControl(void* p) {
 
         pthread_mutex_lock(&seven_lock);
         seven_num = -1;
-        seven_finish = 1;
+        buzzer_run = 0;
         pthread_mutex_unlock(&seven_lock);
-        // 부저 실행
+
+        // seg 동작 끝나면 부저 울리기
+        for (int i = 0; i < 3; i++) {
+            softToneWrite(buzzer, 784);
+            delay(500);
+        }
+
+        pthread_mutex_lock(&seven_lock);
+        buzzer_run = 1;
+        pthread_mutex_unlock(&seven_lock);
     }
 }
