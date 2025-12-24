@@ -3,40 +3,30 @@
 #include <wiringPiI2C.h>
 #include <pthread.h>
 
-#define I2C_DEV "/dev/i2c-1"; /* I2C를 위한 장치 파일 */
-#define I2C_ADDR 0x48         // I2C 장치 주소
-#define Channel 0;            // 조도 센서
-int fd;
+#define I2C_DEV "/dev/i2c-1" /* I2C를 위한 장치 파일 */
+#define I2C_ADDR 0x48        /* I2C 장치 주소 */
+#define cdsChannel 0         /* 조도 센서*/
+#define cdsBoundary 160      /* 조도 센서 밝기 경계값 */
+#define LED_CDS 25           /* GPIO 24 */
 
-int main() {
-    int fd;
-    int i, cnt;
-    int a2dChannel = 0; // analog channel AIN0, CDS sensor
-    int prev, a2dVal;
-    int threshold = 180;
+extern int fd_CDS;
+extern int illuminance;
 
-    if ((fd = wiringPiI2CSetup(I2C_ADDR)) < 0) {
-        printf("wiringPiI2CSetup failed:\n");
-    }
-
-    if ((fd = wiringPiI2CSetupInterface("/dev/i2c-1", I2C_ADDR)) < 0) {
-        printf("wiringPiI2CSetupInterface failed:\n");
-    }
-
-    cnt = 0;
+void* cdsControl(void* p) {
     while (1) {
-        wiringPiI2CWrite(fd, 0x00 | a2dChannel); // 0000_0000
-        prev = wiringPiI2CRead(fd);              // Previously byte, garvage
-        a2dVal = wiringPiI2CRead(fd);
-        printf("[%d] prev = %d, ", cnt, prev);
-        printf("a2dVal = %d, ", a2dVal);
-        if (a2dVal < threshold) {
-            printf("Bright!!\n");
+        wiringPiI2CWrite(fd_CDS, 0x00 | cdsChannel);
+        illuminance = wiringPiI2CRead(fd_CDS);
+        delay(5);
+        illuminance = wiringPiI2CRead(fd_CDS);
+
+        if (illuminance > cdsBoundary) {
+            digitalWrite(LED_CDS, HIGH);
         }
         else {
-            printf("Dark!!\n");
+            digitalWrite(LED_CDS, LOW);
         }
+
+        printf("[ cds ] 현재 조도 값 = %d\n", illuminance);
         delay(1000);
-        cnt++;
     }
 }
