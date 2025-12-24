@@ -43,6 +43,11 @@ OP_FUNC fbuzzer, fcds, fseven;
 pthread_mutex_t buzzer_lock, seven_lock;
 
 int main(int argc, char** argv) {
+    if (daemon(0, 0) == -1) { // ← 데몬 변신 한 줄
+        perror("daemon");
+        exit(1);
+    }
+
     struct sockaddr_in serveraddr, clientaddr;
     int sockfd;
     int client_sd;
@@ -195,7 +200,7 @@ int main(int argc, char** argv) {
                             softPwmWrite(LED_LED, MIN & 255);
                         }
                         else {
-                            printf("LED 잘못된 설정값 입력\n");
+                            sprintf(buf_send, "LED 잘못된 설정값 입력\n");
                         }
                     }
 
@@ -207,14 +212,14 @@ int main(int argc, char** argv) {
                         pthread_mutex_lock(&buzzer_lock);
                         if (!strcmp(cmd2, "ON")) {
                             buzzer_run = 1;
-                            printf("buzzer ON\n");
+                            sprintf(buf_send, "buzzer ON\n");
                         }
                         else if (!strcmp(cmd2, "OFF")) {
                             buzzer_run = 0;
-                            printf("buzzer OFF\n");
+                            sprintf(buf_send, "buzzer OFF\n");
                         }
                         else {
-                            printf("buzzer 잘못된 명렁\n");
+                            sprintf(buf_send, "buzzer 잘못된 설정값 입력\n");
                         }
                         pthread_mutex_unlock(&buzzer_lock);
                     }
@@ -223,11 +228,9 @@ int main(int argc, char** argv) {
                     if (!strcmp(cmd1, "cds")) {
                         if (illuminance > cdsBoundary) {
                             sprintf(buf_send, "조도 센서 값 = %d --> Dark!", illuminance);
-                            write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                         else {
                             sprintf(buf_send, "조도 센서 값 = %d --> Bright!!", illuminance);
-                            write(client_list[i].data.fd, buf_send, strlen(buf_send));
                         }
                     }
 
@@ -245,14 +248,11 @@ int main(int argc, char** argv) {
                                 // 여기서 seg_running 검사하고 thread 생성
                                 pthread_mutex_lock(&seven_lock);
                                 if (seven_num >= 0) {
-                                    printf("이미 7 Segment 동작중\n\n");
                                     sprintf(buf_send, "현재 7 Segment 동작 중입니다. 잠시 후 다시 시도");
                                 }
                                 else {
                                     seven_num = num_input;
-                                    printf("[ seg ] %d 부터 카운트다운 시작\n", num_input);
                                     sprintf(buf_send, "%d 부터 카운트다운 시작\n", num_input);
-                                    write(client_list[i].data.fd, buf_send, strlen(buf_send));
                                 }
                                 pthread_mutex_unlock(&seven_lock);
                             }
@@ -262,6 +262,8 @@ int main(int argc, char** argv) {
                             }
                         }
                     }
+
+                    write(client_list[i].data.fd, buf_send, strlen(buf_send));
                 }
             } // else-end
         } // for-end
