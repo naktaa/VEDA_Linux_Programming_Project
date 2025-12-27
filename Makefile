@@ -1,6 +1,6 @@
 .SUFFIXES:.c.o
 
-OBJS = main.o
+OBJS = main.o init.o server.o event.o globals.o
 FILES = main
 SRCS = $(OBJS:.o=.c)
 
@@ -15,14 +15,14 @@ all: lib main
 lib:
 	cd lib ; $(MAKE)
 
-main: main.o
-	$(CC) -o $@ $@.o $(LFLAGS) $(RFLAGS) 
+main: ${OBJS}
+	$(CC) -o $@ $(OBJS) $(LFLAGS) $(RFLAGS) 
 	
 .c.o:
-	$(CC) -c -g $<
+	$(CC) $(INC) -c -g $<
 
 clean:
-	rm $(FILES) *.o
+	rm $(FILES) $(OBJS)
 	cd lib ; $(MAKE) clean
 	
 # gcc -o total total.c -lwiringPi -lpthread -ldl -rdynamic 

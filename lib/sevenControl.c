@@ -41,13 +41,18 @@ void* sevenControl(void* p) {
         }
 
         pthread_mutex_lock(&buzzer_lock);
+        pthread_mutex_lock(&seven_lock);
         buzzer_run = 0;
+        seven_num = -1;
         pthread_mutex_unlock(&buzzer_lock);
+        pthread_mutex_unlock(&seven_lock);
 
         // seg 동작 끝나면 부저 울리기
         for (int i = 0; i < 3; i++) {
             softToneWrite(buzzer, 784);
-            delay(500);
+            delay(400);
+            softToneWrite(buzzer, 0);
+            delay(100);
         }
 
         pthread_mutex_lock(&buzzer_lock);
