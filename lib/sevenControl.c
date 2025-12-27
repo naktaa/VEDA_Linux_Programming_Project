@@ -6,7 +6,7 @@
 
 #define buzzer 2 /* GPIO 27 */
 
-extern pthread_mutex_t seven_lock;
+extern pthread_mutex_t buzzer_lock, seven_lock;
 extern int sevenGPIO[4];
 extern int seven_num, buzzer_run;
 
@@ -40,10 +40,9 @@ void* sevenControl(void* p) {
             delay(1000);
         }
 
-        pthread_mutex_lock(&seven_lock);
-        seven_num = -1;
+        pthread_mutex_lock(&buzzer_lock);
         buzzer_run = 0;
-        pthread_mutex_unlock(&seven_lock);
+        pthread_mutex_unlock(&buzzer_lock);
 
         // seg 동작 끝나면 부저 울리기
         for (int i = 0; i < 3; i++) {
@@ -51,8 +50,8 @@ void* sevenControl(void* p) {
             delay(500);
         }
 
-        pthread_mutex_lock(&seven_lock);
+        pthread_mutex_lock(&buzzer_lock);
         buzzer_run = 1;
-        pthread_mutex_unlock(&seven_lock);
+        pthread_mutex_unlock(&buzzer_lock);
     }
 }

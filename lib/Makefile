@@ -14,15 +14,16 @@ CC = gcc
 # CC = aarch64-linux-gnu-gcc  # cross comfile
 CFLAGS = -c -fPIC
 OFLAGS = -shared -o
+LDFLAGS = -lwiringPi -lpthread
 
 libbuzzer.so: $(OBJS1)
-	$(CC) $(OFLAGS) $@ $(OBJS1)
+	$(CC) $(OFLAGS) $@ $(OBJS1) $(LDFLAGS)
 	
 libcds.so: $(OBJS2)
-	$(CC) $(OFLAGS) $@ $(OBJS2)
+	$(CC) $(OFLAGS) $@ $(OBJS2) $(LDFLAGS)
 	
 libseven.so: $(OBJS3)
-	$(CC) $(OFLAGS) $@ $(OBJS3)
+	$(CC) $(OFLAGS) $@ $(OBJS3) $(LDFLAGS)
 	
 .c.o:
 	$(CC) $(CFLAGS) $<

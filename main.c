@@ -43,7 +43,8 @@ OP_FUNC fbuzzer, fcds, fseven;
 pthread_mutex_t buzzer_lock, seven_lock;
 
 int main(int argc, char** argv) {
-    if (daemon(0, 0) == -1) { // ← 데몬 변신 한 줄
+    // 데몬프로세스 만들기
+    if (daemon(1, 0) == -1) {
         perror("daemon");
         exit(1);
     }
@@ -69,25 +70,25 @@ int main(int argc, char** argv) {
 
     // 기본세팅
     wiringPiSetup();                /* wiringPi 초기화 */
-    pinMode(LED_LED, OUTPUT);       /* Pin 모드를 출력으로 설정 */
+    pinMode(LED_LED, OUTPUT);       /* LED 출력 설정 */
     softPwmCreate(LED_LED, 0, 255); /* PWM의 범위 설정 */
-    pinMode(LED_CDS, OUTPUT);       /* Pin 모드를 출력으로 설정 */
+    pinMode(LED_CDS, OUTPUT);       /* CDS 출력 설정 */
     for (int i = 0; i < 4; i++) {
-        pinMode(sevenGPIO[i], OUTPUT); /* 모든 Pin의 출력 설정 */
+        pinMode(sevenGPIO[i], OUTPUT); /* 7-segment 출력 설정 */
     }
 
     // 동적 라이브러리 연결
-    handle[0] = dlopen("/home/pi/vedaproject/lib/libbuzzer.so", RTLD_LAZY);
+    handle[0] = dlopen("./lib/libbuzzer.so", RTLD_LAZY);
     if (handle[0] == NULL) {
         printf("%s\n", dlerror());
         exit(1);
     }
-    handle[1] = dlopen("/home/pi/vedaproject/lib/libcds.so", RTLD_LAZY);
+    handle[1] = dlopen("./lib/libcds.so", RTLD_LAZY);
     if (handle[1] == NULL) {
         printf("%s\n", dlerror());
         exit(1);
     }
-    handle[2] = dlopen("/home/pi/vedaproject/lib/libseven.so", RTLD_LAZY);
+    handle[2] = dlopen("./lib/libseven.so", RTLD_LAZY);
     if (handle[2] == NULL) {
         printf("%s\n", dlerror());
         exit(1);
@@ -167,6 +168,7 @@ int main(int argc, char** argv) {
                     close(client_list[i].data.fd);
                 }
                 else {
+                    buf_send[0] = '\0';
                     buf_in[readn] = '\0';
                     ret = strtok(buf_in, " \r\n");
                     strcpy(cmd1, (ret != NULL) ? ret : "");
@@ -205,7 +207,7 @@ int main(int argc, char** argv) {
                     }
 
                     // 부저
-                    if (!strcmp(cmd1, "buzzer")) {
+                    else if (!strcmp(cmd1, "buzzer")) {
                         ret = strtok(NULL, " \r\n");
                         strcpy(cmd2, (ret != NULL) ? ret : "");
 
@@ -225,7 +227,7 @@ int main(int argc, char** argv) {
                     }
 
                     // 조도센서
-                    if (!strcmp(cmd1, "cds")) {
+                    else if (!strcmp(cmd1, "cds")) {
                         if (illuminance > cdsBoundary) {
                             sprintf(buf_send, "조도 센서 값 = %d --> Dark!", illuminance);
                         }
@@ -235,7 +237,7 @@ int main(int argc, char** argv) {
                     }
 
                     // 7세그먼트
-                    if (!strcmp(cmd1, "seg")) {
+                    else if (!strcmp(cmd1, "seg")) {
                         ret = strtok(NULL, " \r\n");
 
                         if (ret == NULL) {
@@ -261,6 +263,10 @@ int main(int argc, char** argv) {
                                 // client에 "잘못된 인자입니다. 0~9만 허용" send
                             }
                         }
+                    }
+
+                    else {
+                        sprintf(buf_send, "잘못된 명령어 입력\n");
                     }
 
                     write(client_list[i].data.fd, buf_send, strlen(buf_send));
