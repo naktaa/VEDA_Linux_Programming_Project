@@ -11,7 +11,7 @@ extern int sevenGPIO[4];
 #define I2C_DEV "/dev/i2c-1" /* I2C를 위한 장치 파일 */
 #define I2C_ADDR 0x48        /* I2C 장치 주소 */
 #define cdsChannel 0         /* 조도 센서*/
-#define cdsBoundary 160      /* 조도 센서 밝기 경계값 */
+#define cdsBoundary 200      /* 조도 센서 밝기 경계값 */
 
 #define ON 255
 #define OFF 0
