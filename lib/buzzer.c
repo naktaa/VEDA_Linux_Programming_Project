@@ -3,14 +3,9 @@
 #include <wiringPi.h>
 #include <softTone.h>
 #include <pthread.h>
+#include "globals.h"
 
-#define buzzer 2                                        /* GPIO 27 */
-#define TOTAL 32                                        /* 학교종의 전체 계이름의 수 */
-#define BIT 200                                         /* 박자 설정 */
 #define music_length (sizeof(notes) / sizeof(notes[0])) /* 음악 전체 계이름의 수 */
-
-extern int buzzer_run;
-extern pthread_mutex_t buzzer_lock;
 
 int notes[] = { // 징글벨
     294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 523, 494, 440, 370,

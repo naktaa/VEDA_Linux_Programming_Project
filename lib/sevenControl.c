@@ -3,12 +3,7 @@
 #include <wiringPi.h>
 #include <softTone.h>
 #include <pthread.h>
-
-#define buzzer 2 /* GPIO 27 */
-
-extern pthread_mutex_t buzzer_lock, seven_lock;
-extern int sevenGPIO[4];
-extern int seven_num, buzzer_run;
+#include "globals.h"
 
 // 7-segment 핀 배치
 int number[10][4] = {{0, 0, 0, 0},  /* 0 */

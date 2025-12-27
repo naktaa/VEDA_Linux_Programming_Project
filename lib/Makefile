@@ -12,6 +12,7 @@ FILES = libbuzzer.so libcds.so libseven.so
 SRCS = $(OBJS:.o=.c)
 CC = gcc
 # CC = aarch64-linux-gnu-gcc  # cross comfile
+INC = -I ../include
 CFLAGS = -c -fPIC
 OFLAGS = -shared -o
 LDFLAGS = -lwiringPi -lpthread
@@ -26,7 +27,7 @@ libseven.so: $(OBJS3)
 	$(CC) $(OFLAGS) $@ $(OBJS3) $(LDFLAGS)
 	
 .c.o:
-	$(CC) $(CFLAGS) $<
+	$(CC) $(INC) $(CFLAGS) $<
 	
 clean:
 	rm *.o $(FILES)
