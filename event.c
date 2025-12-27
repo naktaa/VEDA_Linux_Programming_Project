@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
+#include <strings.h>
 #include <sys/epoll.h>
 #include <wiringPi.h>
 #include <softPwm.h>
@@ -15,14 +16,16 @@ typedef struct cmd_type {
 void handle_led(int fd, char* arg);
 void handle_buzzer(int fd, char* arg);
 void handle_cds(int fd, char* arg);
-void handle_seg(int fd, char* arg);
+void handle_seven(int fd, char* arg);
+void handle_help(int fd, char* arg);
 void command_check(int fd, char* buf_in);
 
 CMD_TYPE client_cmds[] = {
     {"LED", handle_led},
     {"buzzer", handle_buzzer},
     {"cds", handle_cds},
-    {"seg", handle_seg},
+    {"seg", handle_seven},
+    {"help", handle_help},
     {NULL, NULL},
 };
 
@@ -56,7 +59,7 @@ void command_check(int fd, char* buf_in) {
 
     // 지정된 명령어인지 찾기
     for (int i = 0; client_cmds[i].cmd; i++) {
-        if (!strcmp(cmd1, client_cmds[i].cmd)) {
+        if (!strcasecmp(cmd1, client_cmds[i].cmd)) {
             client_cmds[i].cmd_func(fd, cmd2);
             return;
         }
@@ -75,19 +78,19 @@ void handle_led(int fd, char* arg) {
         return;
     }
 
-    if (!strcmp(arg, "ON")) {
+    if (!strcasecmp(arg, "ON")) {
         softPwmWrite(LED_LED, ON & 255);
     }
-    else if (!strcmp(arg, "OFF")) {
+    else if (!strcasecmp(arg, "OFF")) {
         softPwmWrite(LED_LED, OFF & 255);
     }
-    else if (!strcmp(arg, "MAX")) {
+    else if (!strcasecmp(arg, "MAX")) {
         softPwmWrite(LED_LED, MAX & 255);
     }
-    else if (!strcmp(arg, "MID")) {
+    else if (!strcasecmp(arg, "MID")) {
         softPwmWrite(LED_LED, MID & 255);
     }
-    else if (!strcmp(arg, "MIN")) {
+    else if (!strcasecmp(arg, "MIN")) {
         softPwmWrite(LED_LED, MIN & 255);
     }
     else {
@@ -110,11 +113,11 @@ void handle_buzzer(int fd, char* arg) {
     }
 
     pthread_mutex_lock(&buzzer_lock);
-    if (!strcmp(arg, "ON")) {
+    if (!strcasecmp(arg, "ON")) {
         buzzer_run = 1;
         sprintf(msg, "buzzer ON\n");
     }
-    else if (!strcmp(arg, "OFF")) {
+    else if (!strcasecmp(arg, "OFF")) {
         buzzer_run = 0;
         sprintf(msg, "buzzer OFF\n");
     }
@@ -138,7 +141,7 @@ void handle_cds(int fd, char* arg) {
     write(fd, msg, strlen(msg));
 }
 
-void handle_seg(int fd, char* arg) {
+void handle_seven(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
@@ -166,5 +169,18 @@ void handle_seg(int fd, char* arg) {
     }
     pthread_mutex_unlock(&seven_lock);
 
+    write(fd, msg, strlen(msg));
+}
+
+void handle_help(int fd, char* arg) {
+    char msg[] =
+        "==== Command Menu ====\n"
+        "/*   대소문자 구분 X  */\n"
+        "LED    ON/OFF/MAX/MID/MIN\n"
+        "buzzer ON/OFF\n"
+        "cds    현재 조도 값 출력\n"
+        "seg    0~9 값으로 카운트다운 시작\n"
+        "help   도움말 보기\n"
+        "=====================\n";
     write(fd, msg, strlen(msg));
 }
