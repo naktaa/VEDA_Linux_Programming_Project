@@ -19,10 +19,8 @@ void* buzzer_thread(void* p) {
         }
 
         // 재생할 때마다 0.5초 딜레이 주기
-        if (!interrupted) {
-            softToneWrite(buzzer, 0);
-            delay(500);
-        }
+        softToneWrite(buzzer, 0);
+        delay(500);
 
         MUSIC m = musics[music_num];
         int interrupted = 0;
