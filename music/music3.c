@@ -15,4 +15,8 @@ const int delays3[] = {
     BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2,
     BIT, BIT, BIT * 3 / 2, BIT / 2, BIT * 4, BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4};
 
-music_length[2] = sizeof(notes3) / sizeof(notes3[0]);
+void init_music2(void) {
+    musics[2].notes = notes3;
+    musics[2].beats = delays3;
+    musics[2].length = sizeof(notes3) / sizeof(notes3[0]);
+}

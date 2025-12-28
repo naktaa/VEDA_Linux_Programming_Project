@@ -28,6 +28,10 @@ void init_modules(void) {
         pinMode(sevenGPIO[i], OUTPUT);
     }
 
+    init_music1();
+    init_music2();
+    init_music3();
+
     handle[0] = dlopen("./lib/libbuzzer.so", RTLD_LAZY);
     if (!handle[0]) {
         perror("dlopen");

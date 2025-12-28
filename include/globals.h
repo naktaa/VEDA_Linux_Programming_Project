@@ -30,7 +30,6 @@ extern MUSIC musics[MUSIC_COUNT];
 extern int notes1[], delays1[];
 extern int notes2[], delays2[];
 extern int notes3[], delays3[];
-extern int music_length[MUSIC_COUNT];
 
 typedef void* (*OP_FUNC)(void*);
 extern OP_FUNC fbuzzer, fcds, fseven;

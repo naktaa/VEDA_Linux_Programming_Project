@@ -11,11 +11,7 @@ int seven_num = -1;
 int fd_CDS = -1;
 int illuminance = 0;
 
-MUSIC musics[MUSIC_COUNT] = {
-    {notes1, delays1, music_length[0]},
-    {notes2, delays2, music_length[1]},
-    {notes3, delays3, music_length[2]},
-};
+MUSIC musics[MUSIC_COUNT];
 
 OP_FUNC fbuzzer = NULL;
 OP_FUNC fcds = NULL;
