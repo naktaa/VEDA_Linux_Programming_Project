@@ -23,7 +23,7 @@ void init_modules(void) {
 
     // LED, buzzer, cds, 7-segment 설정
     pinMode(LED_LED, OUTPUT);
-    softPwmCreate(LED_LED, 0, 100);
+    softPwmCreate(LED_LED, 0, DUTY);
     softToneCreate(buzzer);
     pinMode(LED_CDS, OUTPUT);
     for (int i = 0; i < 4; i++) {
