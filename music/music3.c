@@ -1,7 +1,5 @@
 #include "globals.h"
 
-#define BIT 200 /* 음악 재생 박자 */
-
 int notes3[] = {
     294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 523, 494, 440, 370,
     587, 587, 523, 440, 494, 392, 294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 330, 523, 494, 440,
@@ -9,14 +7,15 @@ int notes3[] = {
     523, 523, 523, 523, 523, 494, 494, 494, 494, 494, 440, 440, 494, 440, 587, 494, 494, 494, 494, 494, 494,
     494, 587, 392, 440, 494, 523, 523, 523, 523, 523, 494, 494, 494, 587, 587, 523, 440, 392};
 int delays3[] = {
-    BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT, BIT, BIT * 4,
-    BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT,
-    BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 3 / 2, BIT / 2, BIT * 4,
-    BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2,
-    BIT, BIT, BIT * 3 / 2, BIT / 2, BIT * 4, BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4};
+    2, 2, 2, 2, 6, 2, 2, 2, 2, 2, 8, 2, 2, 2, 2, 8,
+    2, 2, 2, 2, 4, 4, 2, 2, 2, 2, 6, 2, 2, 2, 2, 2, 6, 2, 2, 2, 2, 2,
+    3, 1, 2, 2, 2, 2, 2, 2, 8, 2, 2, 4, 2, 2, 4, 2, 2, 3, 1, 8,
+    2, 2, 3, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 4, 4, 2, 2, 4, 2, 2, 4,
+    2, 2, 3, 1, 8, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 2, 2, 8};
 
 void init_music2(void) {
     musics[2].notes = notes3;
-    musics[2].beats = delays3;
+    musics[2].delays = delays3;
     musics[2].length = sizeof(notes3) / sizeof(notes3[0]);
+    musics[2].beat = 100;
 }
