@@ -22,7 +22,7 @@ main: ${OBJS}
 	$(CC) -o $@ $(OBJS) $(LFLAGS) $(RFLAGS) 
 	
 .c.o:
-	$(CC) $(INC) -c -g $<
+	$(CC) $(INC) -c -g -o $@ $<
 
 clean:
 	rm $(FILES) $(OBJS)
