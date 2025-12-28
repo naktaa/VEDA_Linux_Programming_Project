@@ -2,10 +2,10 @@
 
 all: libbuzzer.so libcds.so libseven.so
 
-OBJS = buzzer_thread.o cds_thread.o seven_thread.o
-OBJS1 = buzzer_thread.o
-OBJS2 = cds_thread.o
-OBJS3 = seven_thread.o
+OBJS = buzzerControl.o cdsControl.o sevenControl.o
+OBJS1 = buzzerControl.o
+OBJS2 = cdsControl.o
+OBJS3 = sevenControl.o
 
 FILES = libbuzzer.so libcds.so libseven.so
 
