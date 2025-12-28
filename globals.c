@@ -12,9 +12,9 @@ int fd_CDS = -1;
 int illuminance = 0;
 
 MUSIC musics[MUSIC_COUNT] = {
-    {notes1, delays1, sizeof(notes1) / sizeof(notes1[0])},
-    {notes2, delays2, sizeof(notes2) / sizeof(notes2[0])},
-    {notes3, delays3, sizeof(notes3) / sizeof(notes3[0])},
+    {notes1, delays1, music_length[0]},
+    {notes2, delays2, music_length[1]},
+    {notes3, delays3, music_length[2]},
 };
 
 OP_FUNC fbuzzer = NULL;
