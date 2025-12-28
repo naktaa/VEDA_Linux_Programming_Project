@@ -1,6 +1,9 @@
 .SUFFIXES:.c.o
 
-OBJS = main.o init.o server.o event.o globals.o
+MUSIC_SRCS = $(wildcard music/*.c)
+MUSIC_OBJS = $(MUSIC_SRCS:.c=.o)
+
+OBJS = main.o init.o server.o event.o globals.o $(MUSIC_OBJS)
 FILES = main
 SRCS = $(OBJS:.o=.c)
 

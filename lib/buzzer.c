@@ -5,21 +5,6 @@
 #include <pthread.h>
 #include "globals.h"
 
-#define music_length (sizeof(notes) / sizeof(notes[0])) /* 음악 전체 계이름의 수 */
-
-int notes[] = { // 징글벨
-    294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 523, 494, 440, 370,
-    587, 587, 523, 440, 494, 392, 294, 494, 440, 392, 294, 294, 294, 494, 440, 392, 330, 330, 330, 523, 494, 440,
-    587, 587, 587, 587, 659, 587, 494, 440, 392, 494, 494, 494, 494, 494, 494, 494, 587, 392, 440, 494,
-    523, 523, 523, 523, 523, 494, 494, 494, 494, 494, 440, 440, 494, 440, 587, 494, 494, 494, 494, 494, 494,
-    494, 587, 392, 440, 494, 523, 523, 523, 523, 523, 494, 494, 494, 587, 587, 523, 440, 392};
-int delays[] = {
-    BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT, BIT, BIT * 4,
-    BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT, BIT * 3, BIT, BIT, BIT, BIT, BIT,
-    BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 3 / 2, BIT / 2, BIT * 4,
-    BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT * 2, BIT * 2, BIT, BIT, BIT * 2, BIT, BIT, BIT * 2,
-    BIT, BIT, BIT * 3 / 2, BIT / 2, BIT * 4, BIT, BIT, BIT * 3 / 2, BIT / 2, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT, BIT * 4};
-
 void* buzzerControl(void* p) {
     while (1) {
         pthread_mutex_lock(&buzzer_lock);
@@ -32,7 +17,8 @@ void* buzzerControl(void* p) {
             continue;
         }
 
-        for (int i = 0; i < music_length; ++i) {
+        MUSIC m = musics[music_current];
+        for (int i = 0; i < m.length; ++i) {
             pthread_mutex_lock(&buzzer_lock);
             buzzer_on = buzzer_run;
             music_on = music_run;
@@ -42,10 +28,10 @@ void* buzzerControl(void* p) {
                 break;
             }
 
-            softToneWrite(buzzer, notes[i]);
-            delay(delays[i] * 0.9);
+            softToneWrite(buzzer, m.notes[i]);
+            delay(m.beats[i] * 0.9);
             softToneWrite(buzzer, 0);
-            delay(delays[i] * 0.1);
+            delay(m.beats[i] * 0.1);
         }
     }
 }
