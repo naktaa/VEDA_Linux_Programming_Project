@@ -8,6 +8,10 @@
 #include <dlfcn.h>
 #include "globals.h"
 
+void init_music1(void);
+void init_music2(void);
+void init_music3(void);
+
 void init_modules(void) {
     void* handle[3];
     pthread_t ptBuzzer, ptCds, ptSeven;
