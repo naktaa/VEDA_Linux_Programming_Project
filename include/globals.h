@@ -16,7 +16,7 @@ extern int sevenGPIO[4];
 #define DUTY 100
 #define MAX 90
 #define MID 50
-#define MIN 10
+#define MIN 20
 
 #define BIT 200 /* 음악 재생 박자 */
 
