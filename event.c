@@ -67,7 +67,7 @@ void command_check(int fd, char* buf_in) {
         }
     }
 
-    char* msg = "잘못된 명령어 입력를 입력했습니다. \"help\"를 입력해 명령어 목록을 확인하세요\n";
+    char* msg = "잘못된 명령어를 입력했습니다. \"help\"를 입력해 명령어 목록을 확인하세요\n";
     write(fd, msg, strlen(msg));
 }
 
@@ -98,7 +98,7 @@ void handle_led(int fd, char* arg) {
 
     if (!strcasecmp(arg, "ON")) {
         led_run = 1;
-        softPwmWrite(LED_LED, led_light & DUTY);
+        softPwmWrite(LED_LED, led_light);
     }
     else if (!strcasecmp(arg, "OFF")) {
         led_run = 0;
@@ -106,15 +106,15 @@ void handle_led(int fd, char* arg) {
     }
     else if (!strcasecmp(arg, "MAX")) {
         led_light = MAX;
-        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
+        if (led_run) softPwmWrite(LED_LED, led_light);
     }
     else if (!strcasecmp(arg, "MID")) {
         led_light = MID;
-        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
+        if (led_run) softPwmWrite(LED_LED, led_light);
     }
     else if (!strcasecmp(arg, "MIN")) {
         led_light = MIN;
-        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
+        if (led_run) softPwmWrite(LED_LED, led_light);
     }
     else {
         sprintf(msg, "[LED] 잘못된 설정값 입력. ON/OFF/MAX/MID/MIN 중 하나 입력\n");
@@ -135,6 +135,7 @@ void handle_buzzer(int fd, char* arg) {
         return;
     }
 
+    pthread_mutex_lock(&buzzer_lock);
     if (!strcasecmp(arg, "ON")) {
         music_run = 1;
         sprintf(msg, "[buzzer] ON\n");
@@ -146,12 +147,19 @@ void handle_buzzer(int fd, char* arg) {
     else {
         sprintf(msg, "[buzzer] 잘못된 설정값 입력. ON/OFF 중 하나 입력\n");
     }
+    pthread_mutex_unlock(&buzzer_lock);
 
     write(fd, msg, strlen(msg));
 }
 
 void handle_cds(int fd, char* arg) {
     char msg[128];
+
+    if (arg != NULL) {
+        sprintf(msg, "[cds] 사용법: cds (추가 인자 없음)\n");
+        write(fd, msg, strlen(msg));
+        return;
+    }
 
     pthread_mutex_lock(&cds_lock);
     int val = illuminance;

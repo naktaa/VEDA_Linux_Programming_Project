@@ -13,7 +13,7 @@ int delays2[] = {
     2, 2, 3, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 4, 4, 2, 2, 4, 2, 2, 4,
     2, 2, 3, 1, 8, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 2, 2, 8};
 
-void init_music3(void) {
+void init_music2(void) {
     musics[1].notes = notes2;
     musics[1].delays = delays2;
     musics[1].length = sizeof(notes2) / sizeof(notes2[0]);
