@@ -13,7 +13,7 @@ extern int sevenGPIO[4];
 #define cdsChannel 0         /* 조도 센서*/
 #define cdsBoundary 200      /* 조도 센서 밝기 경계값 */
 
-#define DUTY 100
+#define DUTY 100 /* LED PWM duty 값 */
 #define MAX 90
 #define MID 50
 #define MIN 20
@@ -26,12 +26,12 @@ extern OP_FUNC fbuzzer, fcds, fseven;
 extern pthread_mutex_t buzzer_lock;
 extern pthread_mutex_t seven_lock;
 
-extern int led_light; // led 밝기
+extern int led_light; /* LED 밝기 저장 */
 extern int led_run;
 extern int buzzer_run;
 extern int seven_num;
 extern int seven_finish;
 extern int fd_CDS;
-extern int illuminance;
+extern int illuminance; /* 현재 조도센서 밝기 값 */
 
 #endif
