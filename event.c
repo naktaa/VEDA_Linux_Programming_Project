@@ -86,15 +86,12 @@ void handle_led(int fd, char* arg) {
     }
     else if (!strcasecmp(arg, "MAX")) {
         led_light = MAX;
-        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MID")) {
         led_light = MID;
-        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MIN")) {
         led_light = MIN;
-        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else {
         sprintf(msg, "LED 잘못된 설정값 입력\n");
