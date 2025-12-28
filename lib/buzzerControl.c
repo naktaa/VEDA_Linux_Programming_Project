@@ -19,6 +19,7 @@ void* buzzer_thread(void* p) {
         }
 
         MUSIC m = musics[music_num];
+        int interrupted = 0;
 
         for (int i = 0; i < m.length; i++) {
             pthread_mutex_lock(&buzzer_lock);
@@ -28,6 +29,7 @@ void* buzzer_thread(void* p) {
             pthread_mutex_unlock(&buzzer_lock);
 
             if (!buzzer_on || !music_on || music_num != music_num_check) {
+                interrupted = 1;
                 break;
             }
 
@@ -37,8 +39,10 @@ void* buzzer_thread(void* p) {
             delay(m.delays[i] * m.beat * 0.1);
         }
 
-        // 재생마다 0.5초 딜레이 주기
-        softToneWrite(buzzer, 0);
-        delay(500);
+        // 끝까지 재생했을 때마다 0.5초 딜레이 주기
+        if (!interrupted) {
+            softToneWrite(buzzer, 0);
+            delay(500);
+        }
     }
 }
