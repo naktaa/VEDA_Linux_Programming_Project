@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include "globals.h"
 
-void* cdsControl(void* p) {
+void* cds_thread(void* p) {
     while (1) {
         wiringPiI2CWrite(fd_CDS, 0x00 | cdsChannel);
         int val = wiringPiI2CRead(fd_CDS);

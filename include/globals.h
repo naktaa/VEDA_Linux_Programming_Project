@@ -7,6 +7,7 @@
 #define buzzer 2   /* GPIO 27 */
 #define LED_CDS 25 /* GPIO 24 */
 extern int sevenGPIO[4];
+extern int sevenNumber[10][4];
 
 #define I2C_DEV "/dev/i2c-1" /* I2C를 위한 장치 파일 */
 #define I2C_ADDR 0x48        /* I2C 장치 주소 */

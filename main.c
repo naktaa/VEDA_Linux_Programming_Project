@@ -11,8 +11,8 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    init_modules(); // dlopen, dlsym, thread 생성
-    run_server();   // 소켓/epoll 생성 + 무한 루프
+    init_modules(); // 모듈들 init 설정
+    run_server();   // 서버 동작
 
     return 0;
 }

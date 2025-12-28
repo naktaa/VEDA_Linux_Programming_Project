@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include "globals.h"
 
-void* buzzerControl(void* p) {
+void* buzzer_thread(void* p) {
     while (1) {
         pthread_mutex_lock(&buzzer_lock);
         int buzzer_on = buzzer_run;

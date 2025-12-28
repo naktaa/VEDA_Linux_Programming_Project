@@ -62,7 +62,7 @@ void run_server(void) {
                 ev.data.fd = client_sd;
                 epoll_ctl(efd, EPOLL_CTL_ADD, client_sd, &ev);
             }
-            else {
+            else { /* client 입력 받는 부분 */
                 client_event(efd, &client_list[i]);
             }
         }

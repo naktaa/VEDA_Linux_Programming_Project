@@ -21,6 +21,7 @@ void init_modules(void) {
         exit(1);
     }
 
+    // LED, buzzer, cds, 7-segment 설정
     pinMode(LED_LED, OUTPUT);
     softPwmCreate(LED_LED, 0, 100);
     softToneCreate(buzzer);
@@ -29,10 +30,12 @@ void init_modules(void) {
         pinMode(sevenGPIO[i], OUTPUT);
     }
 
+    // music
     init_music1();
     init_music2();
     init_music3();
 
+    // 동적 라이브러리 설정
     handle[0] = dlopen("./lib/libbuzzer.so", RTLD_LAZY);
     if (!handle[0]) {
         perror("dlopen");
@@ -49,9 +52,9 @@ void init_modules(void) {
         exit(1);
     }
 
-    fbuzzer = (OP_FUNC)dlsym(handle[0], "buzzerControl");
-    fcds = (OP_FUNC)dlsym(handle[1], "cdsControl");
-    fseven = (OP_FUNC)dlsym(handle[2], "sevenControl");
+    fbuzzer = (OP_FUNC)dlsym(handle[0], "buzzer_thread");
+    fcds = (OP_FUNC)dlsym(handle[1], "cds_thread");
+    fseven = (OP_FUNC)dlsym(handle[2], "seven_thread");
 
     pthread_mutex_init(&buzzer_lock, NULL);
     pthread_mutex_init(&cds_lock, NULL);
