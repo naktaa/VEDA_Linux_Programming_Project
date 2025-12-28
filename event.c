@@ -135,11 +135,15 @@ void handle_buzzer(int fd, char* arg) {
 void handle_cds(int fd, char* arg) {
     char msg[128];
 
-    if (illuminance > cdsBoundary) {
-        sprintf(msg, "현재 조도 값 = %d --> 어두움!!\n", illuminance);
+    pthread_mutex_lock(&cds_lock);
+    int val = illuminance
+        pthread_mutex_unlock(&cds_lock);
+
+    if (val > cdsBoundary) {
+        sprintf(msg, "현재 조도 값 = %d --> 어두움!!\n", val);
     }
     else {
-        sprintf(msg, "현재 조도 값 = %d --> 밝음!!\n", illuminance);
+        sprintf(msg, "현재 조도 값 = %d --> 밝음!!\n", val);
     }
     write(fd, msg, strlen(msg));
 }

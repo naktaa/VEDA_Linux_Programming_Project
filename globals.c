@@ -15,5 +15,6 @@ OP_FUNC fcds = NULL;
 OP_FUNC fseven = NULL;
 
 pthread_mutex_t buzzer_lock;
+pthread_mutex_t cds_lock;
 pthread_mutex_t seven_lock;
 pthread_cond_t seven_cond;

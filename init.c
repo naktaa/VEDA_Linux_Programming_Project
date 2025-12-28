@@ -49,6 +49,7 @@ void init_modules(void) {
     fseven = (OP_FUNC)dlsym(handle[2], "sevenControl");
 
     pthread_mutex_init(&buzzer_lock, NULL);
+    pthread_mutex_init(&cds_lock, NULL);
     pthread_mutex_init(&seven_lock, NULL);
     pthread_cond_init(&seven_cond, NULL);
 

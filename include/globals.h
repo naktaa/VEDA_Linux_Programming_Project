@@ -24,6 +24,7 @@ typedef void* (*OP_FUNC)(void*);
 extern OP_FUNC fbuzzer, fcds, fseven;
 
 extern pthread_mutex_t buzzer_lock;
+extern pthread_mutex_t cds_lock;
 extern pthread_mutex_t seven_lock;
 extern pthread_cond_t seven_cond;
 
