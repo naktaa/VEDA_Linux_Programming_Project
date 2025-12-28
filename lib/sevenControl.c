@@ -34,7 +34,7 @@ void* seven_thread(void* p) {
             softToneWrite(buzzer, 0);
             delay(100);
         }
-        delay(400);
+        delay(500);
 
         pthread_mutex_lock(&buzzer_lock);
         buzzer_run = buzzer_save;
