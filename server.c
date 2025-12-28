@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "globals.h"
 #include "event.h"
 
 void run_server(void) {
@@ -50,8 +51,8 @@ void run_server(void) {
     ev.data.fd = sockfd;
     epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &ev);
 
-    while (1) {
-        if ((n = epoll_wait(efd, client_list, 50, -1)) == -1) {
+    while (!stop_flag) {
+        if ((n = epoll_wait(efd, client_list, 50, 1000)) == -1) {
             perror("epoll_wait");
         }
 
@@ -68,5 +69,7 @@ void run_server(void) {
         }
     }
 
+    close(sockfd);
+    close(efd);
     free(client_list);
 }

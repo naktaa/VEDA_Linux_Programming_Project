@@ -6,10 +6,14 @@
 #include "globals.h"
 
 void* seven_thread(void* p) {
-    while (1) {
+    while (!stop_flag) {
         pthread_mutex_lock(&seven_lock);
-        while (seven_num < 0) {
+        while (seven_num < 0 && !stop_flag) {
             pthread_cond_wait(&seven_cond, &seven_lock);
+        }
+        if (stop_flag) {
+            pthread_mutex_unlock(&seven_lock);
+            break;
         }
         int num = seven_num;
         pthread_mutex_unlock(&seven_lock);

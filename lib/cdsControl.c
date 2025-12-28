@@ -5,7 +5,7 @@
 #include "globals.h"
 
 void* cds_thread(void* p) {
-    while (1) {
+    while (!stop_flag) {
         wiringPiI2CWrite(fd_CDS, 0x00 | cdsChannel);
         int val = wiringPiI2CRead(fd_CDS);
         delay(5);

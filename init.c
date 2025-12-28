@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
@@ -9,10 +10,9 @@
 #include "globals.h"
 #include "music.h"
 
-void init_modules(void) {
-    void* handle[3];
-    pthread_t ptBuzzer, ptCds, ptSeven;
+static void* handle[3];
 
+void init_modules(void) {
     wiringPiSetup();
 
     // I2C
@@ -64,4 +64,30 @@ void init_modules(void) {
     pthread_create(&ptBuzzer, NULL, fbuzzer, NULL);
     pthread_create(&ptCds, NULL, fcds, NULL);
     pthread_create(&ptSeven, NULL, fseven, NULL);
+}
+
+void stop_modules(void) {
+    stop_flag = 1;
+
+    // thread 정리
+    pthread_cond_broadcast(&seven_cond); /* seven_thread 부분 cond 강제로 깨우기*/
+    pthread_join(ptBuzzer, NULL);
+    pthread_join(ptCds, NULL);
+    pthread_join(ptSeven, NULL);
+
+    // mutex 정리
+    pthread_mutex_destroy(&buzzer_lock);
+    pthread_mutex_destroy(&cds_lock);
+    pthread_mutex_destroy(&seven_lock);
+    pthread_cond_destroy(&seven_cond);
+
+    // 동적 라이브러리 정리
+    for (int i = 0; i < 3; i++) {
+        dlclose(handle[i]);
+    }
+
+    // 모듈 OFF 처리
+    softToneWrite(buzzer, 0);
+    softPwmWrite(LED_LED, 0);
+    if (fd_CDS >= 0) close(fd_CDS);
 }

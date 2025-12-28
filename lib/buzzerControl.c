@@ -10,7 +10,7 @@ void* buzzer_thread(void* p) {
     int last_music = -1;   // 직전에 재생하던 곡
     int prev_music_on = 0; // 직전의 music_run 상태
 
-    while (1) {
+    while (!stop_flag) {
         pthread_mutex_lock(&buzzer_lock);
         int buzzer_on = buzzer_run;
         int music_on = music_run;
@@ -34,11 +34,6 @@ void* buzzer_thread(void* p) {
             last_music = music_num;
         }
 
-        // 음악 길이 넘어가면 index 초기화
-        if (note_idx >= m.length) {
-            note_idx = 0; // 반복재생
-        }
-
         // 새로 재생할 때마다 0.5초 딜레이 주기
         if (note_idx == 0) {
             softToneWrite(buzzer, 0);
@@ -47,8 +42,13 @@ void* buzzer_thread(void* p) {
 
         MUSIC m = musics[music_num];
 
+        // 음악 길이 넘어가면 index 초기화
+        if (note_idx >= m.length) {
+            note_idx = 0; // 반복재생
+        }
+
         softToneWrite(buzzer, m.notes[note_idx]);
-        delay(m.delays[i] * m.beat - off_delay);
+        delay(m.delays[note_idx] * m.beat - off_delay);
         softToneWrite(buzzer, 0);
         delay(off_delay);
 
