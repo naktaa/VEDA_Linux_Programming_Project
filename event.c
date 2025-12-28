@@ -117,19 +117,17 @@ void handle_buzzer(int fd, char* arg) {
         return;
     }
 
-    pthread_mutex_lock(&buzzer_lock);
     if (!strcasecmp(arg, "ON")) {
-        buzzer_run = 1;
-        sprintf(msg, "buzzer ON\n");
+        music_run = 1;
+        sprintf(msg, "[ buzzer ] ON\n");
     }
     else if (!strcasecmp(arg, "OFF")) {
-        buzzer_run = 0;
+        music_run = 0;
         sprintf(msg, "buzzer OFF\n");
     }
     else {
         sprintf(msg, "buzzer 잘못된 설정값 입력\n");
     }
-    pthread_mutex_unlock(&buzzer_lock);
 
     write(fd, msg, strlen(msg));
 }

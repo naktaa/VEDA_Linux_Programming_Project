@@ -29,8 +29,8 @@ extern pthread_mutex_t seven_lock;
 extern int led_light; /* LED 밝기 저장 */
 extern int led_run;
 extern int buzzer_run;
+extern int music_run;
 extern int seven_num;
-extern int seven_finish;
 extern int fd_CDS;
 extern int illuminance; /* 현재 조도센서 밝기 값 */
 
