@@ -40,5 +40,5 @@ void init_music2(void) {
     musics[1].notes = notes2;
     musics[1].delays = delays2;
     musics[1].length = sizeof(notes2) / sizeof(notes2[0]);
-    musics[1].beat = 80;
+    musics[1].beat = 150;
 }
