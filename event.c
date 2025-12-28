@@ -220,7 +220,7 @@ void handle_music(int fd, char* arg) {
     }
     else {
         music_current = num_input - 1;
-        sprintf(msg, "[music] %d번 음악 재생 시작\n", num_input);
+        sprintf(msg, "[music] 현재 재생 음악 --> %d번 음악\n", num_input);
     }
     pthread_mutex_unlock(&buzzer_lock);
 

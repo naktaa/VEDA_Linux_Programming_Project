@@ -13,7 +13,6 @@ int sevenNumber[10][4] = {{0, 0, 0, 0},  /* 0 */
                           {1, 0, 0, 0},  /* 8 */
                           {1, 0, 0, 1}}; /* 9 */
 
-
 int led_light = 50;
 int led_run = 0;
 int buzzer_run = 1;

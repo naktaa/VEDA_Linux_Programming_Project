@@ -32,9 +32,9 @@ void* buzzer_thread(void* p) {
             }
 
             softToneWrite(buzzer, m.notes[i]);
-            delay(m.beats[i] * 0.9);
+            delay(m.delays[i] * m.beat * 0.9);
             softToneWrite(buzzer, 0);
-            delay(m.beats[i] * 0.1);
+            delay(m.beats[i] * m.beat * 0.1);
         }
 
         // 재생마다 0.5초 딜레이 주기
