@@ -21,7 +21,7 @@ void init_modules(void) {
     }
 
     pinMode(LED_LED, OUTPUT);
-    softPwmCreate(LED_LED, 0, 255);
+    softPwmCreate(LED_LED, 0, 100);
     pinMode(LED_CDS, OUTPUT);
     for (int i = 0; i < 4; i++) {
         pinMode(sevenGPIO[i], OUTPUT);

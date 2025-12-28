@@ -57,7 +57,7 @@ void command_check(int fd, char* buf_in) {
     ret = strtok(NULL, " \r\n");
     cmd2 = ret;
 
-    // 지정된 명령어인지 찾기
+    // 등록된 cmd인지 찾기
     for (int i = 0; client_cmds[i].cmd; i++) {
         if (!strcasecmp(cmd1, client_cmds[i].cmd)) {
             client_cmds[i].cmd_func(fd, cmd2);
@@ -79,19 +79,22 @@ void handle_led(int fd, char* arg) {
     }
 
     if (!strcasecmp(arg, "ON")) {
-        softPwmWrite(LED_LED, ON & 255);
+        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "OFF")) {
-        softPwmWrite(LED_LED, OFF & 255);
+        softPwmWrite(LED_LED, 0);
     }
     else if (!strcasecmp(arg, "MAX")) {
-        softPwmWrite(LED_LED, MAX & 255);
+        led_light = MAX;
+        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MID")) {
-        softPwmWrite(LED_LED, MID & 255);
+        led_light = MID;
+        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MIN")) {
-        softPwmWrite(LED_LED, MIN & 255);
+        led_light = MIN;
+        softPwmWrite(LED_LED, led_light & DUTY);
     }
     else {
         sprintf(msg, "LED 잘못된 설정값 입력\n");

@@ -2,6 +2,7 @@
 
 int sevenGPIO[4] = {4, 1, 16, 15}; /* A, B, C, D : 23 18 15 14 */
 
+int led_light = 50;
 int buzzer_run = 1;
 int seven_num = -1;
 int seven_finish = 0;
