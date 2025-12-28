@@ -20,6 +20,7 @@ extern int sevenNumber[10][4];
 #define MIN 25
 
 #define MUSIC_COUNT 3 /* music 개수 */
+#define off_delay 30  /* music 재생할 때 */
 
 typedef struct { /* music 관리용 구조체 */
     int* notes;  /* 음계 */
