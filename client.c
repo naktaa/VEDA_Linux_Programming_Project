@@ -18,8 +18,7 @@ void chatting(int sd);
 
 int main(int argc, char* argv[]) {
     sigset_t sigset;
-    int sockfd, numbytes;
-    socklen_t addr_len;
+    int sockfd;
     char buf[MAXDATASIZE];
     struct hostent* he;
     struct sockaddr_in server_addr;
@@ -59,9 +58,7 @@ int main(int argc, char* argv[]) {
 }
 
 void chatting(int sd) {
-    fd_set mask, read_fds;
-    int n, i;
-    char ch;
+    int n;
     char buf[MAXDATASIZE];
     struct pollfd pollfds[2];
 
@@ -71,12 +68,6 @@ void chatting(int sd) {
     pollfds[1].events = POLLIN;
 
     while (1) {
-        // printf("=============================================================\n");
-        // printf("cmd 입력\n");
-        // printf("LED ON/OFF/MAX/MID/MIN\n"); // 켜기, 끄기, 최대, 중간, 최저
-        // printf("LED \n");
-        // printf("=============================================================\n");
-
         if (poll(pollfds, 2, -1) == -1) {
             perror("poll");
             return;

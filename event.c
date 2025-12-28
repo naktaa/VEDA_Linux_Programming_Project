@@ -13,19 +13,19 @@ typedef struct cmd_type {
     void (*cmd_func)(int, char*);
 } CMD_TYPE;
 
+void handle_help(int fd, char* arg);
 void handle_led(int fd, char* arg);
 void handle_buzzer(int fd, char* arg);
 void handle_cds(int fd, char* arg);
 void handle_seven(int fd, char* arg);
-void handle_help(int fd, char* arg);
 void command_check(int fd, char* buf_in);
 
 CMD_TYPE client_cmds[] = {
+    {"help", handle_help},
     {"LED", handle_led},
     {"buzzer", handle_buzzer},
     {"cds", handle_cds},
     {"seg", handle_seven},
-    {"help", handle_help},
     {NULL, NULL},
 };
 
@@ -65,7 +65,21 @@ void command_check(int fd, char* buf_in) {
         }
     }
 
-    char* msg = "잘못된 명령어 입력\n";
+    char* msg = "잘못된 명령어 입력를 입력했습니다. \"help\"를 입력해 명령어 목록을 확인하세요\n";
+    write(fd, msg, strlen(msg));
+}
+
+void handle_help(int fd, char* arg) {
+    char msg[] =
+        "================= Command Menu =================\n"
+        "*************** (대소문자 구분 없음) *************/\n"
+        "\n"
+        "  LED    ON/OFF/MAX/MID/MIN   - LED 온오프 및 밝기 제어\n"
+        "  buzzer ON/OFF               - 부저 음악 재생/정지\n"
+        "  cds                         - 현재 조도 값 출력\n"
+        "  seg    0~9                  - 7-Segment 카운트다운 시작\n"
+        "  help                        - 도움말 출력\n"
+        "================================================\n";
     write(fd, msg, strlen(msg));
 }
 
@@ -73,7 +87,7 @@ void handle_led(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
-        sprintf(msg, "LED 명령: ON/OFF/MAX/MID/MIN 중 하나를 입력\n");
+        sprintf(msg, "[LED] 사용법: LED ON/OFF/MAX/MID/MIN\n");
         write(fd, msg, strlen(msg));
         return;
     }
@@ -99,12 +113,12 @@ void handle_led(int fd, char* arg) {
         if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
     }
     else {
-        sprintf(msg, "LED 잘못된 설정값 입력\n");
+        sprintf(msg, "[LED] 잘못된 설정값 입력. ON/OFF/MAX/MID/MIN 중 하나 입력\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
-    sprintf(msg, "LED %s 설정 완료\n", arg);
+    sprintf(msg, "[LED] %s 설정 완료 | 현재 밝기 = %d\n", arg, led_light);
     write(fd, msg, strlen(msg));
 }
 
@@ -112,21 +126,21 @@ void handle_buzzer(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
-        sprintf(msg, "buzzer 명령: ON/OFF 중 하나를 입력\n");
+        sprintf(msg, "[buzzer] 사용법: buzzer ON/OFF\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
     if (!strcasecmp(arg, "ON")) {
         music_run = 1;
-        sprintf(msg, "[ buzzer ] ON\n");
+        sprintf(msg, "[buzzer] ON\n");
     }
     else if (!strcasecmp(arg, "OFF")) {
         music_run = 0;
-        sprintf(msg, "buzzer OFF\n");
+        sprintf(msg, "[buzzer] OFF\n");
     }
     else {
-        sprintf(msg, "buzzer 잘못된 설정값 입력\n");
+        sprintf(msg, "[buzzer] 잘못된 설정값 입력. ON/OFF 중 하나 입력\n");
     }
 
     write(fd, msg, strlen(msg));
@@ -136,14 +150,14 @@ void handle_cds(int fd, char* arg) {
     char msg[128];
 
     pthread_mutex_lock(&cds_lock);
-    int val = illuminance
-        pthread_mutex_unlock(&cds_lock);
+    int val = illuminance;
+    pthread_mutex_unlock(&cds_lock);
 
     if (val > cdsBoundary) {
-        sprintf(msg, "현재 조도 값 = %d --> 어두움!!\n", val);
+        sprintf(msg, "[cds] 현재 조도 값 = %d --> 어두움!!\n", val);
     }
     else {
-        sprintf(msg, "현재 조도 값 = %d --> 밝음!!\n", val);
+        sprintf(msg, "[cds] 현재 조도 값 = %d --> 밝음!!\n", val);
     }
     write(fd, msg, strlen(msg));
 }
@@ -152,13 +166,13 @@ void handle_seven(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
-        sprintf(msg, "\"seg 7\" 과 같이 0~9의 값을 쓰세요\n");
+        sprintf(msg, "[7-Segment] \"seg 7\" 과 같이 0~9의 값을 쓰세요\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
     if (!(arg[0] >= '0' && arg[0] <= '9' && arg[1] == '\0')) {
-        sprintf(msg, "seg 인자는 0~9만 허용\n");
+        sprintf(msg, "[7-Segment] 0~9초만 가능합니다. 다시 입력하세요.\n");
         write(fd, msg, strlen(msg));
         return;
     }
@@ -168,27 +182,14 @@ void handle_seven(int fd, char* arg) {
     // 여기서 seg_running 검사하고 thread 생성
     pthread_mutex_lock(&seven_lock);
     if (seven_num >= 0) {
-        sprintf(msg, "현재 7 Segment 동작 중입니다. 잠시 후 다시 시도\n");
+        sprintf(msg, "[7-Segment] 현재 카운트다운 동작 중입니다. 잠시 후 다시 시도\n");
     }
     else {
         seven_num = num_input;
         pthread_cond_signal(&seven_cond);
-        sprintf(msg, "7 segment [ %d ] 부터 카운트다운 시작\n", num_input);
+        sprintf(msg, "[7-Segment] %d 초부터 카운트다운 시작\n", num_input);
     }
     pthread_mutex_unlock(&seven_lock);
 
-    write(fd, msg, strlen(msg));
-}
-
-void handle_help(int fd, char* arg) {
-    char msg[] =
-        "==== Command Menu ====\n"
-        "/*   대소문자 구분 X  */\n"
-        "LED    ON/OFF/MAX/MID/MIN\n"
-        "buzzer ON/OFF\n"
-        "cds    현재 조도 값 출력\n"
-        "seg    0~9 값으로 카운트다운 시작\n"
-        "help   도움말 보기\n"
-        "=====================\n";
     write(fd, msg, strlen(msg));
 }
