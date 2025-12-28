@@ -25,6 +25,7 @@ extern OP_FUNC fbuzzer, fcds, fseven;
 
 extern pthread_mutex_t buzzer_lock;
 extern pthread_mutex_t seven_lock;
+extern pthread_cond_t seven_cond;
 
 extern int led_light; /* LED 밝기 저장 */
 extern int led_run;

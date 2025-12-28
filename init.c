@@ -50,6 +50,7 @@ void init_modules(void) {
 
     pthread_mutex_init(&buzzer_lock, NULL);
     pthread_mutex_init(&seven_lock, NULL);
+    pthread_cond_init(&seven_cond, NULL);
 
     pthread_create(&ptBuzzer, NULL, fbuzzer, NULL);
     pthread_create(&ptCds, NULL, fcds, NULL);

@@ -19,14 +19,21 @@ int number[10][4] = {{0, 0, 0, 0},  /* 0 */
 
 void* sevenControl(void* p) {
     while (1) {
+        // pthread_mutex_lock(&seven_lock);
+        // int num = seven_num;
+        // pthread_mutex_unlock(&seven_lock);
+
+        // if (num < 0) {
+        //     delay(20);
+        //     continue;
+        // }
+
         pthread_mutex_lock(&seven_lock);
+        while (seven_num < 0) {
+            pthread_cond_wait(&seven_cond, &seven_lock);
+        }
         int num = seven_num;
         pthread_mutex_unlock(&seven_lock);
-
-        if (num < 0) {
-            delay(20);
-            continue;
-        }
 
         for (int n = num; n >= 0; n--) {
             for (int i = 0; i < 4; i++) {

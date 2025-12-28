@@ -168,6 +168,7 @@ void handle_seven(int fd, char* arg) {
     }
     else {
         seven_num = num_input;
+        pthread_cond_signal(&seven_cond);
         sprintf(msg, "7 segment [ %d ] 부터 카운트다운 시작\n", num_input);
     }
     pthread_mutex_unlock(&seven_lock);
