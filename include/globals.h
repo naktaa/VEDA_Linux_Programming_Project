@@ -27,6 +27,7 @@ extern pthread_mutex_t buzzer_lock;
 extern pthread_mutex_t seven_lock;
 
 extern int led_light; // led 밝기
+extern int led_run;
 extern int buzzer_run;
 extern int seven_num;
 extern int seven_finish;

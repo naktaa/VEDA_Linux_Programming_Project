@@ -79,19 +79,24 @@ void handle_led(int fd, char* arg) {
     }
 
     if (!strcasecmp(arg, "ON")) {
+        led_run = 1;
         softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "OFF")) {
+        led_run = 0;
         softPwmWrite(LED_LED, 0);
     }
     else if (!strcasecmp(arg, "MAX")) {
         led_light = MAX;
+        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MID")) {
         led_light = MID;
+        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
     }
     else if (!strcasecmp(arg, "MIN")) {
         led_light = MIN;
+        if (led_run) softPwmWrite(LED_LED, led_light & DUTY);
     }
     else {
         sprintf(msg, "LED 잘못된 설정값 입력\n");
