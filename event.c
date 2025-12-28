@@ -72,7 +72,7 @@ void command_check(int fd, char* buf_in) {
 }
 
 void handle_help(int fd, char* arg) {
-    char msg[] =
+    char msg[1024] =
         "================= Command Menu =================\n"
         "*************** (대소문자 구분 없음) *************/\n"
         "\n"
@@ -81,7 +81,8 @@ void handle_help(int fd, char* arg) {
         "  buzzer  ON/OFF               - 부저 음악 재생/정지\n"
         "  cds                          - 현재 조도 값 출력\n"
         "  seg     0~9                  - 7-Segment 카운트다운 시작\n"
-        "  music   1~4                  - music 종류 선택\n"
+        "  music   1~3                  - music 종류 선택\n"
+        "\n"
         "================================================\n";
     write(fd, msg, strlen(msg));
 }
@@ -182,7 +183,6 @@ void handle_seven(int fd, char* arg) {
 
     int num_input = arg[0] - '0';
 
-    // 여기서 seg_running 검사하고 thread 생성
     pthread_mutex_lock(&seven_lock);
     if (seven_num >= 0) {
         sprintf(msg, "[7-Segment] 현재 카운트다운 동작 중입니다. 잠시 후 다시 시도\n");
@@ -201,30 +201,28 @@ void handle_music(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
-        sprintf(msg, "[music] \"music 3\" 과 같이 1~4의 값을 쓰세요\n");
+        sprintf(msg, "[music] \"music 2\" 과 같이 1~3의 값을 쓰세요\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
-    if (!(arg[0] >= '0' && arg[0] <= '9' && arg[1] == '\0')) {
-        sprintf(msg, "[music] 0~9초만 가능합니다. 다시 입력하세요.\n");
+    if (!(arg[0] >= '1' && arg[0] <= '3' && arg[1] == '\0')) {
+        sprintf(msg, "[music] 1~3 만 가능합니다. 다시 입력하세요.\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
     int num_input = arg[0] - '0';
 
-    // 여기서 seg_running 검사하고 thread 생성
-    pthread_mutex_lock(&seven_lock);
-    if (seven_num >= 0) {
-        sprintf(msg, "[music] 현재 카운트다운 동작 중입니다. 잠시 후 다시 시도\n");
+    pthread_mutex_lock(&buzzer_lock);
+    if ((num_input - 1) == music_current) {
+        sprintf(msg, "[music] 이미 %d번 음악 재생 중. 다른 번호를 입력하세요\n", num_input);
     }
     else {
-        seven_num = num_input;
-        pthread_cond_signal(&seven_cond);
-        sprintf(msg, "[music] %d 초부터 카운트다운 시작\n", num_input);
+        music_current = num_input - 1;
+        sprintf(msg, "[music] %d번 음악 재생 시작\n", num_input);
     }
-    pthread_mutex_unlock(&seven_lock);
+    pthread_mutex_unlock(&buzzer_lock);
 
     write(fd, msg, strlen(msg));
 }
