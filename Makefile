@@ -2,30 +2,38 @@
 
 MUSIC_SRCS = $(wildcard music/*.c)
 MUSIC_OBJS = $(MUSIC_SRCS:.c=.o)
+SERVER_OBJS = main.o init.o server.o event.o globals.o $(MUSIC_OBJS)
+CLIENT_OBJS = client.o
 
-OBJS = main.o init.o server.o event.o globals.o $(MUSIC_OBJS)
-FILES = main
-SRCS = $(OBJS:.o=.c)
+FILES = main client
+SRCS = $(SERVER_OBJS:.o=.c) $(CLIENT_OBJS:.o=.c)
 
-CC = gcc
+SERVERCC = aarch64-linux-gnu-gcc
+CLIENTCC = gcc
 INC = -I include
 LFLAGS = -lwiringPi -lpthread -ldl
 RFLAGS = -rdynamic
 .PHONY : lib clean  # 디렉토리와 이름이 겹칠 때 사용
 
-all: lib main
+all: lib main client
 
 lib:
 	cd lib ; $(MAKE)
 
-main: ${OBJS}
-	$(CC) -o $@ $(OBJS) $(LFLAGS) $(RFLAGS) 
+main: $(SERVER_OBJS)
+	$(SERVERCC) -o $@ $^ $(LFLAGS) $(RFLAGS) 
+	
+client: $(CLIENT_OBJS)
+	$(CLIENTCC) -o $@ $^
 	
 .c.o:
-	$(CC) $(INC) -c -g -o $@ $<
+	$(SERVERCC) $(INC) -c -g -o $@ $<
+
+client.o: client.c
+	$(CLIENTCC) $(INC) -c -g -o $@ $<
 
 clean:
-	rm $(FILES) $(OBJS)
+	rm $(FILES) $(SERVER_OBJS) $(CLIENT_OBJS)
 	cd lib ; $(MAKE) clean
 	
 # gcc -o total total.c -lwiringPi -lpthread -ldl -rdynamic 

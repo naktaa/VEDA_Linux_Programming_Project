@@ -10,8 +10,8 @@ OBJS3 = sevenControl.o
 FILES = libbuzzer.so libcds.so libseven.so
 
 SRCS = $(OBJS:.o=.c)
-CC = gcc
-# CC = aarch64-linux-gnu-gcc  # cross comfile
+# CC = gcc
+CC = aarch64-linux-gnu-gcc  # cross comfile
 INC = -I ../include
 CFLAGS = -c -fPIC
 OFLAGS = -shared -o
