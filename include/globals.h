@@ -39,7 +39,7 @@ extern int notes4[], delays4[];
 typedef void* (*OP_FUNC)(void*);
 extern OP_FUNC fbuzzer, fcds, fseven;
 
-volatile sig_atomic_t stop_flag; /* 서버 종료됐는지 flag */
+extern volatile sig_atomic_t stop_flag; /* 서버 종료됐는지 flag */
 extern pthread_t ptBuzzer, ptCds, ptSeven;
 
 extern pthread_mutex_t buzzer_lock;
