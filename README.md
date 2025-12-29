@@ -1,7 +1,7 @@
 # VEDA Linux Programming Project
 
 **Version** : v1.0.0  
-**Author**  : 손현석 (Nakta), moneydon77@naver.com  
+**Author**  : 손현석 수석, moneydon77@naver.com  
 **Last Updated** : 2025-12-29  
 
 라즈베리파이에서 TCP 프로토콜을 통해 LED, buzzer, cds, 7-segment 모듈을 제어하는 프로그램입니다. 서버(`main`)는 포트 60000을 열고  클라이언트(`client`)는 명령을 전송합니다. 런타임에는 `lib/libbuzzer.so`, `lib/libcds.so`, `lib/libseven.so`를 동적으로 로드합니다.
