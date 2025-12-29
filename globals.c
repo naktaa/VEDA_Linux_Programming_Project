@@ -28,7 +28,7 @@ OP_FUNC fbuzzer = NULL;
 OP_FUNC fcds = NULL;
 OP_FUNC fseven = NULL;
 
-volatile stop_flag;
+volatile sig_atomic_t stop_flag = 0;
 pthread_t ptBuzzer, ptCds, ptSeven;
 
 pthread_mutex_t buzzer_lock;
