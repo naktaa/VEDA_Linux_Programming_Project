@@ -38,6 +38,7 @@ void* seven_thread(void* p) {
             softToneWrite(buzzer, 784);
             delay(400);
         }
+        softToneWrite(buzzer, 0);
         delay(500);
 
         pthread_mutex_lock(&buzzer_lock);
