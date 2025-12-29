@@ -32,6 +32,10 @@ client: $(CLIENT_OBJS)
 client.o: client.c
 	$(CLIENTCC) $(INC) -c -g -o $@ $<
 
+# install: 
+# 	scp main pi@192.168.0.29:/home/pi/ttest/
+# 	scp ./lib/lib*.so pi@192.168.0.29:/home/pi/ttest/lib/
+
 clean:
 	rm $(FILES) $(SERVER_OBJS) $(CLIENT_OBJS)
 	cd lib ; $(MAKE) clean
