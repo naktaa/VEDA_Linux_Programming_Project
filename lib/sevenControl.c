@@ -33,10 +33,10 @@ void* seven_thread(void* p) {
 
         // seg 동작 끝나면 부저 울리기
         for (int i = 0; i < 3; i++) {
-            softToneWrite(buzzer, 784);
-            delay(400);
             softToneWrite(buzzer, 0);
             delay(100);
+            softToneWrite(buzzer, 784);
+            delay(400);
         }
         delay(500);
 

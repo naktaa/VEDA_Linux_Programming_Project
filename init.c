@@ -34,6 +34,7 @@ void init_modules(void) {
     init_music1();
     init_music2();
     init_music3();
+    init_music4();
 
     // 동적 라이브러리 설정
     handle[0] = dlopen("./lib/libbuzzer.so", RTLD_LAZY);

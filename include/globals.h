@@ -13,14 +13,14 @@ extern int sevenNumber[10][4];
 #define I2C_DEV "/dev/i2c-1" /* I2C를 위한 장치 파일 */
 #define I2C_ADDR 0x48        /* I2C 장치 주소 */
 #define cdsChannel 0         /* 조도 센서 채널 */
-#define cdsBoundary 210      /* 조도 센서 밝기 경계값 */
+#define cdsBoundary 150      /* 조도 센서 밝기 경계값 */
 
 #define DUTY 100 /* LED PWM duty 값 */
 #define MAX 80
 #define MID 50
 #define MIN 25
 
-#define MUSIC_COUNT 3 /* music 개수 */
+#define MUSIC_COUNT 4 /* music 개수 */
 #define off_delay 30  /* music 재생할 때 */
 
 typedef struct { /* music 관리용 구조체 */
@@ -34,6 +34,7 @@ extern MUSIC musics[MUSIC_COUNT];
 extern int notes1[], delays1[];
 extern int notes2[], delays2[];
 extern int notes3[], delays3[];
+extern int notes4[], delays4[];
 
 typedef void* (*OP_FUNC)(void*);
 extern OP_FUNC fbuzzer, fcds, fseven;

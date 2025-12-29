@@ -81,7 +81,7 @@ void handle_help(int fd, char* arg) {
         "  buzzer  ON/OFF               - 부저 음악 재생/정지\n"
         "  cds                          - 현재 조도 값 출력\n"
         "  seg     0~9                  - 7-Segment 카운트다운 시작\n"
-        "  music   1~3                  - music 종류 선택\n"
+        "  music   1~4                  - music 종류 선택\n"
         "\n"
         "================================================\n";
     write(fd, msg, strlen(msg));
@@ -209,13 +209,13 @@ void handle_music(int fd, char* arg) {
     char msg[128];
 
     if (!arg) {
-        sprintf(msg, "[music] \"music 2\" 과 같이 1~3의 값을 쓰세요\n");
+        sprintf(msg, "[music] \"music 2\" 과 같이 1~4의 값을 쓰세요\n");
         write(fd, msg, strlen(msg));
         return;
     }
 
-    if (!(arg[0] >= '1' && arg[0] <= '3' && arg[1] == '\0')) {
-        sprintf(msg, "[music] 1~3 만 가능합니다. 다시 입력하세요.\n");
+    if (!(arg[0] >= '1' && arg[0] <= '4' && arg[1] == '\0')) {
+        sprintf(msg, "[music] 1~4 만 가능합니다. 다시 입력하세요.\n");
         write(fd, msg, strlen(msg));
         return;
     }
