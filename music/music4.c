@@ -73,5 +73,5 @@ void init_music4(void) {
     musics[3].notes = notes4;
     musics[3].delays = delays4;
     musics[3].length = sizeof(notes4) / sizeof(notes4[0]);
-    musics[3].beat = 200;
+    musics[3].beat = 300;
 }
